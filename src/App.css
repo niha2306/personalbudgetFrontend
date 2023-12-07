@@ -1,0 +1,12 @@
+.loginHeader {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.homePageBackground {
+  background-image: url('../public/images/budget.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+}
