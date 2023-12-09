@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 
-const Navbar = ({ children }) => {
+const Navbar = () => {
     return (
         <>
-            <nav className="navbar navbar-expand-md bg-dark navbar-dark">
+            <nav className="navbar navbar-expand-md bg-dark navbar-dark" >
                 <Link className="navbar-brand" to={'/'}>Personal Budget</Link>
                 <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
                     <span className="navbar-toggler-icon"></span>
@@ -19,10 +19,12 @@ const Navbar = ({ children }) => {
                         <li className="nav-item">
                             <Link className="nav-link" to={'/login'}>Login</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/signup'}>Register</Link>
+                        </li>
                     </ul>
                 </div>
             </nav>
-            {children}
         </>
     )
 };

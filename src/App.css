@@ -4,9 +4,6 @@
 }
 
 .homePageBackground {
-  background-image: url('../public/images/budget.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh;
+  background-color: aliceblue;
+  height: 90vh !important;
 }

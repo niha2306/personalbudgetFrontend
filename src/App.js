@@ -8,6 +8,7 @@ import Home from './Home';
 import Login from './Login'
 import Navbar from './Navbar';
 import Dashboard from './Dashboard';
+import Register from './Register';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />
           <Route path='/dashboard'element={<Dashboard />} />
+          <Route path='/signup' element={<Register />} />
         </Routes>
       </Router>
   );
