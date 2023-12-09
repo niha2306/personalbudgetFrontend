@@ -1,21 +1,23 @@
+import { Link } from "react-router-dom";
+
 const Navbar = ({ children }) => {
     return (
         <>
-            <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-                <a class="navbar-brand" href="#">Personal Budget</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-                    <span class="navbar-toggler-icon"></span>
+            <nav className="navbar navbar-expand-md bg-dark navbar-dark">
+                <Link className="navbar-brand" to={'/'}>Personal Budget</Link>
+                <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                    <span className="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="collapsibleNavbar">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">Home</a>
+                <div className="collapse navbar-collapse" id="collapsibleNavbar">
+                    <ul className="navbar-nav">
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/'}>Home</Link>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/dashboard'}>Dashboard</Link>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/login">Login</a>
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/login'}>Login</Link>
                         </li>
                     </ul>
                 </div>
