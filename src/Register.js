@@ -26,7 +26,7 @@ const Register = () => {
             })
             .catch(error => console.log(error));
 
-        
+
     }
     const validateEmail = (email) => {
         var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,7 +53,7 @@ const Register = () => {
             });
             valid = false;
         } else {
-            if(mobile.value.length !== 10) {
+            if (mobile.value.length !== 10) {
                 setMobile({
                     ...mobile,
                     error: "mobile number should be 10 digits"
@@ -93,18 +93,22 @@ const Register = () => {
         }
 
         if (valid) {
-            const response = await axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/users');
-            const data = response.data;
-            let isEmailAlreadyTaken = false;
-            for(const d of data) {
-                if(d?.email === email.value) {
-                    isEmailAlreadyTaken = true;
-                    alert("Email is already in Use Please provide different email");
-                    break;
+            try {
+                const response = await axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/users');
+                const data = response.data;
+                let isEmailAlreadyTaken = false;
+                for (const d of data) {
+                    if (d?.email === email.value) {
+                        isEmailAlreadyTaken = true;
+                        alert("Email is already in Use Please provide different email");
+                        break;
+                    }
                 }
-            }
-            if(!isEmailAlreadyTaken) {
-                onFinish();
+                if (!isEmailAlreadyTaken) {
+                    onFinish();
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
     }
@@ -137,7 +141,7 @@ const Register = () => {
                     <input type="password" className="form-control" id="re-enterpwd" placeholder="Re-Enter password" name="repswd" value={reenteredPwd.value} onChange={(e) => setReenteredPwd({ value: e.target.value, error: '' })} />
                     <p style={{ color: 'red' }}>{reenteredPwd.error && reenteredPwd.error}</p>
                 </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Register</button>
             </form>
         </div>
     )

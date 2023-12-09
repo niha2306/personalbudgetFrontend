@@ -3,7 +3,6 @@
   align-items: center !important;
 }
 
-.homePageBackground {
+body {
   background-color: aliceblue;
-  height: 90vh !important;
 }
