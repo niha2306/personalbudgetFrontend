@@ -21,7 +21,7 @@ const Home = () => {
     }, []);
 
     useEffect(() => {
-        axios.get('http://localhost:3001/api/budget')
+        axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget')
             .then(res => setBudgetData(res.data))
             .catch(error => console.log(error));
     }, [refresh])
@@ -85,7 +85,7 @@ const Home = () => {
         try {
             console.log(budgetId, title, budget, month);
             if (budgetId) {
-                await axios.put(`http://localhost:3001/api/budget/${budgetId}`, {
+                await axios.put(`https://lazy-plum-blackbuck-hem.cyclic.app/${budgetId}`, {
                     title: title.value,
                     budget: budget.value,
                     month: month.value
@@ -95,7 +95,7 @@ const Home = () => {
                 setBudget({ value: '', error: '' });
                 setMonth({ value: '', error: '' });
             } else {
-                await axios.post('http://localhost:3001/api/budget', {
+                await axios.post('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget', {
                     title: title.value,
                     budget: budget.value,
                     month: month.value
@@ -113,7 +113,7 @@ const Home = () => {
 
     const deleteBudget = async (id) => {
         try {
-            await axios.delete(`http://localhost:3001/api/budget/${id}`);
+            await axios.delete(`https://lazy-plum-blackbuck-hem.cyclic.app/api/budget/${id}`);
             alert('Budget deleted Successfully');
         } catch(error) {
             console.log(error);
