@@ -85,7 +85,7 @@ const Home = () => {
         try {
             console.log(budgetId, title, budget, month);
             if (budgetId) {
-                await axios.put(`https://lazy-plum-blackbuck-hem.cyclic.app/${budgetId}`, {
+                await axios.put(`https://lazy-plum-blackbuck-hem.cyclic.app/api/budget/${budgetId}`, {
                     title: title.value,
                     budget: budget.value,
                     month: month.value
