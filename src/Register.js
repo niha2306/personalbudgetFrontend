@@ -10,14 +10,13 @@ const Register = () => {
 
     const onFinish = async () => {
         const data = {
-            name: name,
-            email: email,
-            mobile: mobile,
-            password: password
+            name: name.value,
+            email: email.value,
+            mobile: mobile.value,
+            password: password.value
         };
-        axios.post('https://lazy-plum-blackbuck-hem.cyclic.app/api/users', data)
-            .then(res => res.data())
-            .then(data => console.log(data))
+        axios.post('http://localhost:3001/api/users', data)
+            .then(res => console.log(res))
             .catch(error => console.log(error));
 
     }
