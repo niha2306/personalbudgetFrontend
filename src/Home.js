@@ -3,14 +3,21 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-    const [budgetData, setBudgetData] = useState(null);
+    const [budgetData, setBudgetData] = useState([null]);
     const [title, setTitle] = useState({ value: '', error: '' });
     const [budget, setBudget] = useState({ value: '', error: '' });
     const [month, setMonth] = useState({ value: '', error: '' });
+    const [year, setYear] = useState({ value: '', error: '' });
     const [refresh, setRefresh] = useState(false);
     const [closeForm, setCloseForm] = useState(false);
     const [formTitle, setFormTitle] = useState('Add Budget');
     const [budgetId, setBudgetId] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(null);
+    const [filteredBudget, setFilteredBudget] = useState([]);
+    const [years, setYears] = useState([]);
+    const [selectedYear, setSelectedYear] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(null);
+
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -22,14 +29,55 @@ const Home = () => {
 
     useEffect(() => {
         axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget')
-            .then(res => setBudgetData(res.data))
+            .then(res => {
+                const data = res.data;
+                setBudgetData(data);
+                const years = new Set();
+                for(const d of data) {
+                    years.add(d?.year);
+                }
+                const Years = [{name: 'Select Year', value: ''}];
+                for(const y of years) {
+                    Years.push({name: y, value: y});
+                }
+                setYears(Years);
+            })
             .catch(error => console.log(error));
-    }, [refresh])
+    }, [refresh]);
+
+    useEffect(() => {
+        if(budgetData){
+            let data = budgetData;
+            if(selectedYear) {
+                data = data?.filter((budget) => {
+                    if(budget?.year === selectedYear) {
+                        return budget;
+                    }
+                })
+            }
+            if(selectedMonth && selectedMonth >= 1 ) {
+                data = data?.filter((budget) => {
+                    if(budget?.month === selectedMonth) {
+                        return budget;
+                    }
+                })
+            } 
+            if(searchTerm) {
+                data = data?.filter((budget) => {
+                    return budget?.title.toLowerCase().includes(searchTerm.toLowerCase());
+                })
+            }
+            setFilteredBudget(data);
+            console.log(selectedMonth, selectedYear);
+        }
+    }, [budgetData, selectedMonth, selectedYear, searchTerm])
+
+
 
     const monthOptions = [
         {
             name: 'Select Month',
-            value: 0,
+            value: '',
         },
         {
             name: 'January',
@@ -83,28 +131,28 @@ const Home = () => {
 
     const onFinish = async () => {
         try {
-            console.log(budgetId, title, budget, month);
+            console.log(budgetId, title, budget, month, year);
             if (budgetId) {
                 await axios.put(`https://lazy-plum-blackbuck-hem.cyclic.app/api/budget/${budgetId}`, {
                     title: title.value,
                     budget: budget.value,
-                    month: month.value
+                    month: month.value,
+                    year: year.value
                 });
                 alert('budget updated sucessfully');
-                setTitle({ value: '', error: '' });
-                setBudget({ value: '', error: '' });
-                setMonth({ value: '', error: '' });
+                resetFormFields();
+                setRefresh(!refresh);
             } else {
                 await axios.post('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget', {
                     title: title.value,
                     budget: budget.value,
-                    month: month.value
+                    month: month.value,
+                    year: year.value
                 });
                 alert('budget added sucessfully');
-                setTitle({ value: '', error: '' });
-                setBudget({ value: '', error: '' });
-                setMonth({ value: '', error: '' });
+                resetFormFields();
                 setCloseForm(true);
+                setRefresh(!refresh);
             }
         } catch (error) {
             console.log(error);
@@ -115,7 +163,8 @@ const Home = () => {
         try {
             await axios.delete(`https://lazy-plum-blackbuck-hem.cyclic.app/api/budget/${id}`);
             alert('Budget deleted Successfully');
-        } catch(error) {
+            setRefresh(!refresh);
+        } catch (error) {
             console.log(error);
         }
     }
@@ -143,7 +192,13 @@ const Home = () => {
             });
             valid = false;
         }
-
+        if (year.value === '' || year.value === null) {
+            setYear({
+                ...year,
+                error: "Please Select the Year"
+            });
+            valid = false;
+        }
         if (valid) {
             onFinish();
         }
@@ -153,6 +208,32 @@ const Home = () => {
         setTitle({ value: '', error: '' });
         setBudget({ value: '', error: '' });
         setMonth({ value: '', error: '' });
+        setYear({ value: '', error: '' });
+        setBudgetId(null);
+    }
+
+    const getYearDropdown = () => {
+        let currentYear = new Date().getFullYear();
+        let years = [{name: 'Select Year', value: ''}];
+        while (currentYear >= 2010) {
+            years.push({ name: currentYear, value: currentYear });
+            currentYear--;
+        }
+        return (
+            <div className="form-group">
+                <label htmlFor="dropdownSelect">Select Year:</label>
+                <select className="form-control" id="dropdownSelect" name="selectedOption" value={year.value} onChange={(e) => setYear({ value: e.target.value, error: '' })}>
+                    {
+                        years.map((year, index) => {
+                            return (
+                                <option value={year.value} key={index}>{year.name}</option>
+                            )
+                        })
+                    }
+                </select>
+                <p style={{ color: 'red' }}>{year.error && year.error}</p>
+            </div>
+        )
     }
 
     return (
@@ -165,37 +246,59 @@ const Home = () => {
                         data-target="#myModal"
                         style={{ marginLeft: 'auto' }}
                         onClick={() => {
-                            setTitle({ value: '', error: '' });
-                            setBudget({ value: '', error: '' });
-                            setMonth({ value: '', error: '' });
+                            resetFormFields();
                             setFormTitle('Add Budget')
                         }}>
                         Add Budget
                     </button>
                 </div>
 
+                <div className="searchOptions">
+                    <input type="search" className="form-control" onChange={(e) => setSearchTerm(e.target.value)} />
+                    <select className="form-control ml-2" id="dropdownSelect" name="selectedOption" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+                        {
+                            monthOptions.map((month, index) => {
+                                return (
+                                    <option value={month.value} key={index}>{month.name}</option>
+                                )
+                            })
+                        }
+                    </select>
+                    <select className="form-control ml-2" id="dropdownSelect" name="selectedOption" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+                        {
+                            years.map((year, index) => {
+                                return (
+                                    <option value={year.value} key={index}>{year.name}</option>
+                                )
+                            })
+                        }
+                    </select>
+                </div>
                 <table className="table table-bordered table-striped mt-3" style={{ background: '#0d0d0d', borderRadius: '15px', color: 'white' }}>
                     <thead>
                         <tr>
                             <th>Title</th>
                             <th>budget</th>
                             <th>Month</th>
+                            <th>Year</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
-                            budgetData?.map((data, index) => {
+                            filteredBudget && filteredBudget?.map((data, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{data?.title}</td>
                                         <td>{data?.budget}</td>
                                         <td>{data?.month}</td>
+                                        <td>{data?.year}</td>
                                         <td>
                                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                 <button className="btn btn-primary ml-5" data-toggle="modal" data-target="#myModal" onClick={() => {
                                                     setTitle({ value: data?.title, error: '' });
                                                     setBudget({ value: data?.budget, error: '' });
                                                     setMonth({ value: data?.month, error: '' });
+                                                    setYear({value: data?.year, error: ''});
                                                     setBudgetId(data?._id);
                                                     setFormTitle('Edit Budget');
                                                 }}>Edit</button>
@@ -238,13 +341,14 @@ const Home = () => {
                                         {
                                             monthOptions.map((month, index) => {
                                                 return (
-                                                    <option value={month.value} key={index}>{month.name}</option>
+                                                    <option value={month.value} key={month.value}>{month.name}</option>
                                                 )
                                             })
                                         }
                                     </select>
                                     <p style={{ color: 'red' }}>{month.error && month.error}</p>
                                 </div>
+                                {getYearDropdown()}
                                 <div className="modal-footer">
                                     <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={resetFormFields}>Close</button>
                                     <button type="submit" className="btn btn-primary">{formTitle}</button>

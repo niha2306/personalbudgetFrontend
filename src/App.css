@@ -6,3 +6,22 @@
 body {
   background-color: aliceblue;
 }
+
+.stylechart {
+  margin-top: 24px;
+  border: 1px solid #615f5f;
+  padding-top: 24px;
+  width: 500px !important;
+  height: 500px !important;
+}
+.searchOptions {
+  margin-top: 24px;
+  display: flex !important;
+  flex-direction: row;
+  width: 70% !important;
+}
+
+.barchartstyle {
+  display: flex !important;
+  flex-direction: row !important;
+}
