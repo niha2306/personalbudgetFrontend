@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { checkJWTExpired } from "./utils";
 
-const Home = () => {
+const Home = (props) => {
     const [budgetData, setBudgetData] = useState([null]);
     const [title, setTitle] = useState({ value: '', error: '' });
     const [budget, setBudget] = useState({ value: '', error: '' });
     const [month, setMonth] = useState({ value: '', error: '' });
     const [year, setYear] = useState({ value: '', error: '' });
     const [refresh, setRefresh] = useState(false);
-    const [closeForm, setCloseForm] = useState(false);
     const [formTitle, setFormTitle] = useState('Add Budget');
     const [budgetId, setBudgetId] = useState(null);
     const [selectedMonth, setSelectedMonth] = useState(null);
@@ -18,22 +18,31 @@ const Home = () => {
     const [selectedYear, setSelectedYear] = useState(null);
     const [searchTerm, setSearchTerm] = useState(null);
 
+    const userId = localStorage.getItem('userId');
 
     const navigate = useNavigate();
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token === null || token === '') {
+        const isTokenExpired = checkJWTExpired(token);
+        if (token === null || token === '' || isTokenExpired) {
+            alert('Your session is expired. Please Login in again..');
+            localStorage.removeItem('token');
             navigate('/login', { replace: true });
         }
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
         axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget')
             .then(res => {
                 const data = res.data;
-                setBudgetData(data);
+                const filteredUserData = data?.filter((d) => {
+                    if(d?.userId == userId) {
+                        return data;
+                    }
+                })
+                setBudgetData(filteredUserData);
                 const years = new Set();
-                for(const d of data) {
+                for(const d of filteredUserData) {
                     years.add(d?.year);
                 }
                 const Years = [{name: 'Select Year', value: ''}];
@@ -43,7 +52,7 @@ const Home = () => {
                 setYears(Years);
             })
             .catch(error => console.log(error));
-    }, [refresh]);
+    }, [refresh, userId]);
 
     useEffect(() => {
         if(budgetData){
@@ -68,7 +77,6 @@ const Home = () => {
                 })
             }
             setFilteredBudget(data);
-            console.log(selectedMonth, selectedYear);
         }
     }, [budgetData, selectedMonth, selectedYear, searchTerm])
 
@@ -137,7 +145,8 @@ const Home = () => {
                     title: title.value,
                     budget: budget.value,
                     month: month.value,
-                    year: year.value
+                    year: year.value,
+                    userId: userId,
                 });
                 alert('budget updated sucessfully');
                 resetFormFields();
@@ -147,11 +156,11 @@ const Home = () => {
                     title: title.value,
                     budget: budget.value,
                     month: month.value,
-                    year: year.value
+                    year: year.value,
+                    userId: userId,
                 });
                 alert('budget added sucessfully');
                 resetFormFields();
-                setCloseForm(true);
                 setRefresh(!refresh);
             }
         } catch (error) {
@@ -254,7 +263,7 @@ const Home = () => {
                 </div>
 
                 <div className="searchOptions">
-                    <input type="search" className="form-control" onChange={(e) => setSearchTerm(e.target.value)} />
+                    <input type="search" className="form-control" placeholder="Search title...." onChange={(e) => setSearchTerm(e.target.value)} />
                     <select className="form-control ml-2" id="dropdownSelect" name="selectedOption" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                         {
                             monthOptions.map((month, index) => {

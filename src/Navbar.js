@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-    const token = localStorage.getItem('token');
-    console.log(token);
+
     return (
         <>
             <nav className="navbar navbar-expand-md bg-dark navbar-dark" >
@@ -11,20 +10,16 @@ const Navbar = () => {
                     <span className="navbar-toggler-icon"></span>
                 </button>
                 <div className="collapse navbar-collapse" id="collapsibleNavbar">
-                <ul className="navbar-nav">
-                    { token ? (
-                        <><li className="nav-item">
-                                <Link className="nav-link" to={'/'}>Home</Link>
-                            </li><li className="nav-item">
-                                    <Link className="nav-link" to={'/dashboard'}>Dashboard</Link>
-                                </li></>
-                    ):(
-                        <><li className="nav-item">
-                            <Link className="nav-link" to={'/login'}>Login</Link>
-                        </li><li className="nav-item">
-                                <Link className="nav-link" to={'/signup'}>Register</Link>
-                            </li></>
-                    )}
+                    <ul className="navbar-nav">
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/'}>Home</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/dashboard'}>Dashboard</Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to={'/logout'}>LogOut</Link>
+                        </li>
                     </ul>
                 </div>
             </nav>

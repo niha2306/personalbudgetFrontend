@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Register = () => {
     const [name, setName] = useState({ value: '', error: '' });
@@ -142,6 +143,7 @@ const Register = () => {
                     <p style={{ color: 'red' }}>{reenteredPwd.error && reenteredPwd.error}</p>
                 </div>
                 <button type="submit" className="btn btn-primary">Register</button>
+                <Link to={'/login'} className="btn btn-primary ml-5">Back To Login</Link>
             </form>
         </div>
     )

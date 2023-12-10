@@ -9,18 +9,38 @@ import Login from './Login'
 import Navbar from './Navbar';
 import Dashboard from './Dashboard';
 import Register from './Register';
+import SignOut from './SignOut';
+import { checkJWTExpired } from './utils';
+import axios from 'axios';
 
 function App() {
+  setInterval(() => {
+    const refreshToken = async (token) => {
+      const response = await axios.post('http://localhost:3001/login/refresh', { token: token });
+      const resData = response.data;
+      localStorage.setItem('token', resData?.data?.token);
+      localStorage.setItem('userId', resData?.data?.id);
+    }
+    const token = localStorage.getItem('token');
+    if (token) {
+      const userConsent = window.confirm('Your session is about to expire. Do you want to refresh your token?');
+      if (userConsent) {
+        refreshToken(token);
+      }
+
+    }
+  }, 60000)
   return (
     <Router>
       <Navbar />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/dashboard'element={<Dashboard />} />
-          <Route path='/signup' element={<Register />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/signup' element={<Register />} />
+        <Route path='/logout' element={<SignOut />} />
+      </Routes>
+    </Router>
   );
 }
 

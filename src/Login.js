@@ -1,11 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
 
     const [email, setEmail] = useState({ value: '', error: '' });
     const [password, setPassword] = useState({ value: '', error: '' });
+
     const navigate = useNavigate();
 
     const onFinish = async () => {
@@ -14,7 +15,10 @@ const Login = () => {
                 email: email.value,
                 password: password.value
             });
-            localStorage.setItem('token', response.data?.token);
+            const resData = response.data;
+            console.log(resData);
+            localStorage.setItem('token', resData?.data?.token);
+            localStorage.setItem('userId', resData?.data?.id);
             navigate('/', {replace: true});
         } catch (error) {
             console.log(error);
@@ -60,6 +64,7 @@ const Login = () => {
                             <p style={{ color: 'red' }}>{password.error && password.error}</p>
                         </div>
                         <button type="submit" className="btn btn-primary">Login</button>
+                        <Link to={'/signup'} className="btn btn-primary ml-5">Register</Link>
                     </form>
                 </div>
             </div>

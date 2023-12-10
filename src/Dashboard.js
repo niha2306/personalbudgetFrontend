@@ -12,19 +12,26 @@ import {
     Legend,
     ArcElement,
 } from 'chart.js';
+import { checkJWTExpired } from "./utils";
 
 const Dashboard = () => {
 
     const currentYear = new Date().getFullYear()
+    const currentMonth = new Date().getMonth()+1;
+    console.log(currentMonth);
     const [budgetData, setBudgetData] = useState(null);
     const [refresh, setRefresh] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(`${currentMonth}`);
     const [filteredBudget, setFilteredBudget] = useState(null);
     const [years, setYears] = useState([]);
     const [selectedYear, setSelectedYear] = useState(`${currentYear}`);
     const [chartLabels, setChartLabels] = useState([]);
     const [chartData, setChartData] = useState([]);
     const [charBackgrounds, setChartBackgrounds] = useState([]);
+    const [monthlyAgg, setMonthlyAgg] = useState([]);
+    const [yearlyAgg, setYearlyAgg] = useState([]); 
+    const userId = localStorage.getItem('userId');
+
 
     const monthOptions = [
         {
@@ -84,7 +91,10 @@ const Dashboard = () => {
     const navigate = useNavigate();
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token === null || token === '') {
+        const isTokenExpired = checkJWTExpired(token);
+        if (token === null || token === '' || isTokenExpired) {
+            alert('Your session is expired. Please Login in again..');
+            localStorage.removeItem('token');
             navigate('/login', { replace: true });
         }
     }, []);
@@ -93,9 +103,14 @@ const Dashboard = () => {
         axios.get('https://lazy-plum-blackbuck-hem.cyclic.app/api/budget')
             .then(res => {
                 const data = res.data;
-                setBudgetData(data);
+                const filteredUserData = data?.filter((d) => {
+                    if(d?.userId == userId) {
+                        return data;
+                    }
+                })
+                setBudgetData(filteredUserData);
                 const years = new Set();
-                for (const d of data) {
+                for(const d of filteredUserData) {
                     years.add(d?.year);
                 }
                 const Years = [{ name: 'Select Year', value: '' }];
@@ -169,7 +184,7 @@ const Dashboard = () => {
                 },
                 title: {
                     display: true,
-                    text: 'Bar Chart',
+                    text: 'Budget bar chart',
                 },
             },
         };
@@ -177,7 +192,7 @@ const Dashboard = () => {
         const data = {
             datasets: [
                 {
-                    label: 'budget',
+                    label: '# of budget',
                     data: chartData,
                     backgroundColor: charBackgrounds,
                     borderWidth: 2,
@@ -190,6 +205,18 @@ const Dashboard = () => {
 
     const createPieChart = () => {
         ChartJS.register(ArcElement, Tooltip, Legend);
+        const options = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Budget pie chart',
+                },
+            },
+        };
         const data = {
             datasets: [
                 {
@@ -201,7 +228,7 @@ const Dashboard = () => {
             ],
             labels: chartLabels,
         }  
-        return <Pie data={data} height={300} width={300}/>
+        return <Pie data={data} options={options} height={300} width={300}/>
     }
     return (
         <div className="container">
