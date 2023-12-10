@@ -16,7 +16,7 @@ import axios from 'axios';
 function App() {
   setInterval(() => {
     const refreshToken = async (token) => {
-      const response = await axios.post('http://localhost:3001/login/refresh', { token: token });
+      const response = await axios.post('https://lazy-plum-blackbuck-hem.cyclic.app/login/refresh', { token: token });
       const resData = response.data;
       localStorage.setItem('token', resData?.data?.token);
       localStorage.setItem('userId', resData?.data?.id);
