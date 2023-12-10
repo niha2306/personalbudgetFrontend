@@ -16,7 +16,6 @@ const Login = () => {
                 password: password.value
             });
             const resData = response.data;
-            console.log(resData);
             localStorage.setItem('token', resData?.data?.token);
             localStorage.setItem('userId', resData?.data?.id);
             navigate('/', {replace: true});
