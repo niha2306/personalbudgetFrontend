@@ -29,7 +29,7 @@ function App() {
       }
 
     }
-  }, 6000000)
+  }, 60000)
   return (
     <Router>
       <Navbar />
